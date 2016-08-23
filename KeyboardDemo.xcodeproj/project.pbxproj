@@ -15,6 +15,7 @@
 		1F142C901D6C1CC60058AB63 /* KeyboardDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F142C8F1D6C1CC60058AB63 /* KeyboardDemoTests.swift */; };
 		1F142C9B1D6C1D8C0058AB63 /* Keyboard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F142C9A1D6C1D8C0058AB63 /* Keyboard.xib */; };
 		1F142C9D1D6C1E080058AB63 /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F142C9C1D6C1E080058AB63 /* Keyboard.swift */; };
+		1F142C9F1D6C238B0058AB63 /* PianoKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F142C9E1D6C238B0058AB63 /* PianoKey.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,7 @@
 		1F142C911D6C1CC60058AB63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1F142C9A1D6C1D8C0058AB63 /* Keyboard.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Keyboard.xib; sourceTree = "<group>"; };
 		1F142C9C1D6C1E080058AB63 /* Keyboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
+		1F142C9E1D6C238B0058AB63 /* PianoKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PianoKey.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +87,7 @@
 				1F142C7C1D6C1CC60058AB63 /* ViewController.swift */,
 				1F142C9A1D6C1D8C0058AB63 /* Keyboard.xib */,
 				1F142C9C1D6C1E080058AB63 /* Keyboard.swift */,
+				1F142C9E1D6C238B0058AB63 /* PianoKey.swift */,
 				1F142C7E1D6C1CC60058AB63 /* Main.storyboard */,
 				1F142C811D6C1CC60058AB63 /* Assets.xcassets */,
 				1F142C831D6C1CC60058AB63 /* LaunchScreen.storyboard */,
@@ -205,6 +208,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F142C7D1D6C1CC60058AB63 /* ViewController.swift in Sources */,
+				1F142C9F1D6C238B0058AB63 /* PianoKey.swift in Sources */,
 				1F142C9D1D6C1E080058AB63 /* Keyboard.swift in Sources */,
 				1F142C7B1D6C1CC60058AB63 /* AppDelegate.swift in Sources */,
 			);
