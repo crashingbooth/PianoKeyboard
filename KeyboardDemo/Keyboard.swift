@@ -26,7 +26,6 @@ import UIKit
         get { return whiteKeyHeight * 0.65}
     }
     var pianoKeys = [PianoKey]()
-    
 
     override func drawRect(rect: CGRect) {
         addPianoKeysWithCurrentFrames()
@@ -49,7 +48,96 @@ import UIKit
     
     func setUp() {
         createKeys()
+        multipleTouchEnabled = true
+        
+//        let gesture = UIPanGestureRecognizer(target: self, action: #selector(Keyboard.handleFinger(_:)))
+//        addGestureRecognizer(gesture)
         addPianoKeysWithCurrentFrames()
+    }
+    
+    func handleFinger(gesture: UIPanGestureRecognizer) {
+        print("got gesture")
+        let location = gesture.locationInView(self)
+        
+        for key in pianoKeys {
+            if key.frame.contains(location) {
+                print("found touch in \(key.midiNoteNumber)")
+            }
+        }
+    }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("touches began")
+        for touch in touches {
+             checkKeysForTouch(touch)
+        }
+    }
+    
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("touches moved")
+        for touch in touches {
+            if !self.frame.contains(touch.locationInView(self)) {
+                findOldKeyFromTouchAndRelease(touch, newKey: nil)
+            } else {
+                checkKeysForTouch(touch)
+            }
+        }
+    }
+    
+    
+    private func checkKeysForTouch(touch:UITouch) {
+        let loc = touch.locationInView(self)
+        var selectedKeys = [PianoKey]()
+        for key in pianoKeys {
+            if key.frame.contains(loc) {
+                selectedKeys.append(key)
+            }
+        }
+        
+        // only one key must be white
+        if selectedKeys.count == 1 {
+            let newKey = selectedKeys[0]
+            newKey.pressed()
+            findOldKeyFromTouchAndRelease(touch, newKey: newKey)
+        } else {
+            // if multiple keys, only press black key
+            for key in selectedKeys {
+                if key.keyType == PianoKey.KeyType.Black && key.keyState != .Pressed {
+                    key.pressed()
+                    findOldKeyFromTouchAndRelease(touch, newKey: key)
+                    break
+                }
+            }
+        }
+    }
+    private func findOldKeyFromTouchAndRelease(touch: UITouch, newKey: PianoKey? = nil) {
+        let oldLoc = touch.previousLocationInView(self)
+        for key in pianoKeys {
+            if key.frame.contains(oldLoc) && key != newKey {
+                key.released()
+            }
+        }
+        
+    }
+    
+        
+    
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("ended")
+        for touch in touches {
+            let formerLoc = touch.previousLocationInView(self)
+            for key in pianoKeys {
+                if key.frame.contains(formerLoc) {
+                    key.released()
+                }
+            }
+        }
+    }
+    
+    override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
+        print("cancel")
+       
+        
     }
     
    
@@ -65,7 +153,9 @@ import UIKit
             }
             if whiteKeyNum == numWhiteKeys && currentType == .Black { break }
             let key = PianoKey(frame: CGRect.zero, midiNoteNumber: root + UInt8(absoluteNum), type: currentType)
-            key.addTarget(key, action: Selector("pressed:"), forControlEvents: UIControlEvents.TouchDown)
+//            key.addTarget(key, action: Selector("pressed:"), forControlEvents: [UIControlEvents.TouchDown, UIControlEvents.TouchDragEnter])
+//            key.addTarget(key, action: Selector("released:"), forControlEvents: [UIControlEvents.TouchUpInside, UIControlEvents.TouchDragExit])
+            
             pianoKeys.append(key)
             absoluteNum += 1
         }

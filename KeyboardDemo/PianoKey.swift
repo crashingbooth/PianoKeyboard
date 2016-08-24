@@ -22,7 +22,7 @@ class PianoKey: UIButton {
         case Default, Pressed
     }
     
-    
+    var keyState: KeyStates = .Default
     var keyNumber: Int!
     var midiNoteNumber: UInt8!
     var isDisabled =  false
@@ -33,6 +33,7 @@ class PianoKey: UIButton {
         self.normalColor = type == .White ? UIColor.whiteColor() : UIColor.blackColor()
         self.midiNoteNumber = midiNoteNumber
         super.init(frame: frame)
+        userInteractionEnabled = false
     }
     
   
@@ -52,41 +53,46 @@ class PianoKey: UIButton {
         path.lineWidth = 2.0
         return path
     }
-    func pressed(sender: UIButton!) {
-        print("pressed: \(midiNoteNumber)")
-        delegate?.keyPushReceived(self)
-   
+    
+    func pressed() {
+        if keyState != .Pressed {
+            print("pressed: \(midiNoteNumber)")
+            keyState = .Pressed
+            setNeedsDisplay()
+            delegate?.keyPushReceived(self)
+        }
     }
+    
+    func released() {
+        if keyState != .Default {
+            
+            print("released: \(midiNoteNumber)")
+            keyState = .Default
+            setNeedsDisplay()
+            delegate?.keyPushReceived(self)
+        }
+        
+    }
+    
+    
+    
+    
     
     override func drawRect(rect: CGRect) {
       
         let path = getPathAtMargin()
-        normalColor.setFill()
+        switch keyState {
+        case .Default:
+            normalColor.setFill()
+        case .Pressed:
+            UIColor.lightGrayColor().setFill()
+        }
         UIColor.blackColor().setStroke()
         path.fill()
         path.stroke()
     }
     
 }
-
-//
-//class PianoKeyFactory {
-//    enum PianoKeyType {
-//        case Black, White
-//    }
-//    class func createPianoKey(pianoKeyType: PianoKeyType, width: CGFloat, height: CGFloat) -> PianoKey {
-//        let key = PianoKey()
-//
-//        switch (pianoKeyType) {
-//        case .Black:
-//            key.normalColor = UIColor.blackColor()
-//        case .White:
-//            key.normalColor = UIColor.whiteColor()
-//                  }
-//        return key
-//    }
-//}
-
 
 
 protocol PianoKeyDelegate: class{
