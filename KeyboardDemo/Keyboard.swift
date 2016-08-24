@@ -9,7 +9,10 @@
 import UIKit
 
 @IBDesignable class Keyboard: UIView, PianoKeyDelegate{
+    let keyPattern:[PianoKey.KeyType] = [.White, .Black, .White, .Black, .White, .White, .Black, .White,.Black, .White, .Black, .White]
+    let blackKeyOffset:[CGFloat] = [4.0, 5.5, 0.0, 4.0, 5.0, 6.0, 0.0] // measured from Roland A-500 keyboard
     let numWhiteKeys = 15
+    let root:UInt8 = 48
     var whiteKeyWidth: CGFloat {
         get { return self.bounds.width / CGFloat(numWhiteKeys)}
     }
@@ -24,11 +27,10 @@ import UIKit
     }
     var pianoKeys = [PianoKey]()
     
-//    // Only override drawRect: if you perform custom drawing.
-//    // An empty implementation adversely affects performance during animation.
-//    override func drawRect(rect: CGRect) {
-//        // Drawing code
-//    }
+
+    override func drawRect(rect: CGRect) {
+        addPianoKeysWithCurrentFrames()
+    }
 
     var view: UIView!
     override init(frame: CGRect) {
@@ -46,60 +48,56 @@ import UIKit
     }
     
     func setUp() {
-        addWhiteKeys()
-        addBlackKeys()
-        setKeyIndices()
+        createKeys()
+        addPianoKeysWithCurrentFrames()
     }
     
-    func drawKeys() {
-        // removeKeys if present
+   
+    
+    private func createKeys() {
+        var whiteKeyNum = 0
+        var absoluteNum = 0
+        var currentType: PianoKey.KeyType!
+        while whiteKeyNum <= numWhiteKeys {
+            currentType = keyPattern[absoluteNum % 12]
+            if currentType == PianoKey.KeyType.White {
+                 whiteKeyNum += 1
+            }
+            if whiteKeyNum == numWhiteKeys && currentType == .Black { break }
+            let key = PianoKey(frame: CGRect.zero, midiNoteNumber: root + UInt8(absoluteNum), type: currentType)
+            key.addTarget(key, action: Selector("pressed:"), forControlEvents: UIControlEvents.TouchDown)
+            pianoKeys.append(key)
+            absoluteNum += 1
+        }
+    }
+    
+    private func addPianoKeysWithCurrentFrames() {
         for key in pianoKeys {
             key.removeFromSuperview()
         }
         
+        var whiteKeyNum = 0
         for key in pianoKeys {
+            let keyFrame: CGRect!
+            if key.keyType == PianoKey.KeyType.White {
+                keyFrame = CGRect(x: CGFloat(whiteKeyNum) * whiteKeyWidth, y: 0, width: whiteKeyWidth, height: whiteKeyHeight)
+                whiteKeyNum += 1
+            } else {
+                let offset = blackKeyOffset[(whiteKeyNum - 1) % 7]
+                keyFrame = CGRect(x: CGFloat(whiteKeyNum - 1) * whiteKeyWidth + whiteKeyWidth * (offset/7.0), y: 0, width: blackKeyWidth, height: blackKeyHeight)
+            }
+            key.frame = keyFrame
             addSubview(key)
         }
-    }
-    
-    private func addWhiteKeys() {
-        for key in 0..<numWhiteKeys {
-            let wk = PianoKeyFactory.createPianoKey(PianoKeyFactory.PianoKeyType.White, width: whiteKeyWidth, height: whiteKeyHeight)
-            wk.frame = CGRect(x: CGFloat(key) * whiteKeyWidth, y: 0, width: whiteKeyWidth, height: whiteKeyHeight)
-            wk.addTarget(wk, action: Selector("pressed:"), forControlEvents: UIControlEvents.TouchDown)
-            addSubview(wk)
-            pianoKeys.append(wk)
-        }
         
-    }
-    private func addBlackKeys() {
-        var offset:[Int:CGFloat] = [0: 4.0, 1: 5.5, 3: 4.0,4:5.0,5:6.0] //from Roland A-500 keyboard
-        var pos = 0 // index to insert black key
-        for key in 0..<numWhiteKeys  {
-            pos += 1  // count 1 white key
-            // add black key except at 2 (between E and F) and 6 (bt'n B and C)
-            let pitchClass = key % 7
-            if pitchClass != 2 && pitchClass % 7 != 6 {
-                let bk = PianoKeyFactory.createPianoKey(PianoKeyFactory.PianoKeyType.Black, width: blackKeyWidth, height: blackKeyHeight)
-                bk.frame = CGRect(x: CGFloat(key) * whiteKeyWidth + whiteKeyWidth * (offset[pitchClass]!/7.0), y: 0, width: blackKeyWidth, height: blackKeyHeight)
-         
-                bk.addTarget(bk, action: Selector("pressed:"), forControlEvents: UIControlEvents.TouchDown)
-                addSubview(bk)
-                pianoKeys.insert(bk, atIndex: pos)
-                pos += 1 // count 1 black key
+        // put black keys on top
+        for key in pianoKeys {
+            if key.keyType == PianoKey.KeyType.Black {
+                bringSubviewToFront(key)
             }
-            
         }
     }
     
-    private func setKeyIndices() {
-        for (i,key) in pianoKeys.enumerate() {
-            key.delegate = self
-            key.keyNumber = i
-            let C4 = 48 // it's midinote number
-            key.midiNoteNumber = UInt8(i + C4)
-        }
-    }
     
     func playNoteFromKeyboard(sender: PianoKey) -> Void {
         
