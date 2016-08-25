@@ -56,7 +56,7 @@ class PianoKey: UIButton {
     
     func pressed() -> Bool {
         if keyState != .Pressed {
-            print("pressed: \(midiNoteNumber)")
+//            print("pressed: \(midiNoteNumber)")
             keyState = .Pressed
             setNeedsDisplay()
             delegate?.keyPushReceived(self)
@@ -69,7 +69,7 @@ class PianoKey: UIButton {
     func released() -> Bool {
         if keyState != .Default {
             
-            print("released: \(midiNoteNumber)")
+//            print("released: \(midiNoteNumber)")
             keyState = .Default
             setNeedsDisplay()
             delegate?.keyPushReceived(self)

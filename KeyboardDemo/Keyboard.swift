@@ -82,14 +82,12 @@ import UIKit
     
 
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        print("touches began")
         for touch in touches {
              checkKeysForTouch(touch)
         }
     }
     
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-//        print("touches moved")
         for touch in touches {
             if !self.frame.contains(touch.locationInView(self)) {
                 findOldKeyFromTouchAndRelease(touch, newKey: nil)
@@ -101,30 +99,13 @@ import UIKit
     
     
     private func checkKeysForTouch(touch:UITouch) {
-        let loc = touch.locationInView(self)
-        var selectedKeys = [PianoKey]()
-        for key in pianoKeys {
-            if key.frame.contains(loc) {
-                selectedKeys.append(key)
-            }
-        }
-        
-        // only one key must be white
-        if selectedKeys.count == 1 {
-            let newKey = selectedKeys[0]
-            pressAdded(newKey)
-            findOldKeyFromTouchAndRelease(touch, newKey: newKey)
-        } else {
-            // if multiple keys, only press black key
-            for key in selectedKeys {
-                if key.keyType == PianoKey.KeyType.Black && key.keyState != .Pressed {
-                    pressAdded(key)
-                    findOldKeyFromTouchAndRelease(touch, newKey: key)
-                    break
-                }
-            }
+        if let key = getKeyOfTouch(touch) {
+            pressAdded(key)
+            findOldKeyFromTouchAndRelease(touch, newKey: key)
         }
     }
+    
+    // maybe don't care about newkey, b/c checking alltouches
     private func findOldKeyFromTouchAndRelease(touch: UITouch, newKey: PianoKey? = nil) {
         let oldLoc = touch.previousLocationInView(self)
         for key in pianoKeys {
@@ -132,37 +113,39 @@ import UIKit
                 pressRemoved(key)
             }
         }
-        
     }
     
-        
-    
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        print("ended")
+        
         for touch in touches {
-            let formerLoc = touch.previousLocationInView(self)
-            for key in pianoKeys {
-                if key.frame.contains(formerLoc) {
-                   pressRemoved(key)
+            if let key = getKeyOfTouch(touch) {
+                
+                // verify that there isn't another finger pressed to same key
+                if var allTouches = event?.allTouches() {
+                    allTouches.remove(touch)
+                    let noteSet = getNoteSetFromTouches(allTouches)
+                    if !noteSet.contains(key.midiNoteNumber) {
+                        pressRemoved(key)
+                    }
                 }
             }
         }
-        if let allTouches = event?.allTouches() {
-            verifyTouches(allTouches)
-        }
+        
+        let allTouches = event?.allTouches() ?? Set<UITouch>()
+        verifyTouches(allTouches)
     }
     
     override func touchesCancelled(touches: Set<UITouch>?, withEvent event: UIEvent?) {
-        print("cancel")
-       
+        let allTouches = event?.allTouches() ?? Set<UITouch>()
+        verifyTouches(allTouches)
         
     }
     
     private func pressAdded(key: PianoKey) {
-        
-        key.pressed()
-        pressedKeys.insert(key.midiNoteNumber)
-        print("added \(key.midiNoteNumber), \(pressedKeys)")
+        if key.pressed() {
+            pressedKeys.insert(key.midiNoteNumber)
+            print("added \(key.midiNoteNumber), \(pressedKeys)")
+        }
     }
     
     private func pressRemoved(key: PianoKey) {
@@ -171,45 +154,36 @@ import UIKit
         print("released!!! \(key.midiNoteNumber), \(pressedKeys)")
     }
     
-    private func debugVerifySet() {
-        var actuallyPressed = Set<UInt8>()
-        for key in pianoKeys {
-            if key.keyState == .Pressed {
-                actuallyPressed.insert(key.midiNoteNumber)
-            }
-        }
-        if actuallyPressed == pressedKeys {
-            print("all good")
-        } else {
-            
-            print("extra")
-            print(pressedKeys)
-            print(actuallyPressed)
-        }
-    }
     
-    private func verifyTouches(touches: Set<UITouch>) {
+    private func getNoteSetFromTouches(touches: Set<UITouch>) -> Set<UInt8> {
         var touchedKeys = Set<UInt8>()
         for touch in touches {
             if let key = getKeyOfTouch(touch) {
-            touchedKeys.insert(key.midiNoteNumber)
+                touchedKeys.insert(key.midiNoteNumber)
             }
         }
-        let disjunct = pressedKeys.subtract(touchedKeys)
+        return touchedKeys
+    }
+    
+    
+    private func verifyTouches(touches: Set<UITouch>) {
+        // clean up any stuck notes
+        let disjunct = pressedKeys.subtract(getNoteSetFromTouches(touches))
         if !disjunct.isEmpty {
             print("stuck notes: \(disjunct)")
-            // change later to removes keys by index
-            for key in pianoKeys {
-                if disjunct.contains(key.midiNoteNumber) {
-                    pressRemoved(key)
-                }
+            for note in disjunct {
+                pressRemoved(getKeyFromMidiNote(note))
             }
-    
         }
     }
     
-   
+    private func getKeyFromMidiNote(midiNoteNumber: UInt8) -> PianoKey {
+        let index = Int(midiNoteNumber - root)
+        return pianoKeys[index]
+    }
     
+   
+    // MARK: - SetUp and Geometry
     private func createKeys() {
         var whiteKeyNum = 0
         var absoluteNum = 0
