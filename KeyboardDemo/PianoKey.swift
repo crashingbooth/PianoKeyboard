@@ -54,22 +54,28 @@ class PianoKey: UIButton {
         return path
     }
     
-    func pressed() {
+    func pressed() -> Bool {
         if keyState != .Pressed {
             print("pressed: \(midiNoteNumber)")
             keyState = .Pressed
             setNeedsDisplay()
             delegate?.keyPushReceived(self)
+            return true
+        } else {
+            return false
         }
     }
     
-    func released() {
+    func released() -> Bool {
         if keyState != .Default {
             
             print("released: \(midiNoteNumber)")
             keyState = .Default
             setNeedsDisplay()
             delegate?.keyPushReceived(self)
+            return true
+        } else {
+            return false
         }
         
     }
