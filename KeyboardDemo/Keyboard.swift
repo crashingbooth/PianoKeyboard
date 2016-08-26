@@ -8,11 +8,18 @@
 
 import UIKit
 
-@IBDesignable class Keyboard: UIView, PianoKeyDelegate{
+@IBDesignable class Keyboard: UIView {
+    // set this value for size of keyboard (7 = 1 octave):
+    let numWhiteKeys = 14
+    let root:UInt8 = 48 // pitch of lowest note
+    
+    var pianoKeys = [PianoKey]()
+    var pressedKeys = Set<UInt8>()
+    
+    // MARK: - Geometry
     let keyPattern:[PianoKey.KeyType] = [.White, .Black, .White, .Black, .White, .White, .Black, .White,.Black, .White, .Black, .White]
     let blackKeyOffset:[CGFloat] = [4.0, 5.5, 0.0, 4.0, 5.0, 6.0, 0.0] // measured from Roland A-500 keyboard
-    let numWhiteKeys = 19
-    let root:UInt8 = 48
+    
     var whiteKeyWidth: CGFloat {
         get { return self.bounds.width / CGFloat(numWhiteKeys)}
     }
@@ -20,19 +27,12 @@ import UIKit
         get { return self.bounds.height }
     }
     var blackKeyWidth: CGFloat {
-        get { return whiteKeyWidth * (5.0/7.0)}
+        get { return whiteKeyWidth * (5.0/7.0)} // measured from Roland A-500 keyboard
     }
     var blackKeyHeight: CGFloat {
         get { return whiteKeyHeight * 0.65}
     }
-    var pianoKeys = [PianoKey]()
-    var pressedKeys = Set<UInt8>()
-
-    override func drawRect(rect: CGRect) {
-        addPianoKeysWithCurrentFrames()
-    }
-
-    var view: UIView!
+   
     
     
     // MARK: - Init and SetUp
@@ -53,6 +53,10 @@ import UIKit
     }
     
     override func layoutSubviews() {
+        addPianoKeysWithCurrentFrames()
+    }
+    
+    override func drawRect(rect: CGRect) {
         addPianoKeysWithCurrentFrames()
     }
     
@@ -219,19 +223,5 @@ import UIKit
             }
         }
     }
-    
-   
-
-    
-    func playNoteFromKeyboard(sender: PianoKey) -> Void {
-        
-    }
-    func keyPushReceived(sender: PianoKey) -> Void {
-        
-    }
-
-    
-    
-    
     
 }
