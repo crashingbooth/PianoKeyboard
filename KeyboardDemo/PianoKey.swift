@@ -25,7 +25,6 @@ class PianoKey: UIButton {
     }
     
     var keyState: KeyStates = .Default
-    weak var delegate: PianoKeyDelegate?
     
     init(frame: CGRect, midiNoteNumber: UInt8, type: KeyType) {
         self.keyType = type
@@ -77,10 +76,8 @@ class PianoKey: UIButton {
     // MARK: - Respond to key presses
     func pressed() -> Bool {
         if keyState != .Pressed {
-            print("pressed: \(midiNoteNumber)")
             keyState = .Pressed
             setNeedsDisplay()
-            delegate?.noteOn(self.midiNoteNumber)
             return true
         } else {
             return false
@@ -89,11 +86,8 @@ class PianoKey: UIButton {
     
     func released() -> Bool {
         if keyState != .Default {
-            
-            print("released: \(midiNoteNumber)")
             keyState = .Default
             setNeedsDisplay()
-            delegate?.noteOff(self.midiNoteNumber)
             return true
         } else {
             return false
@@ -103,10 +97,7 @@ class PianoKey: UIButton {
 }
 
 
-protocol PianoKeyDelegate: class{
-    func noteOn(note: UInt8) -> Void
-    func noteOff(note: UInt8) -> Void
-}
+
 
 
 

@@ -19,6 +19,7 @@ import UIKit
     
     var pianoKeys = [PianoKey]()
     var pressedKeys = Set<UInt8>()
+    weak var delegate: PianoDelegate?
     
     // MARK: - Geometry
     let keyPattern:[PianoKey.KeyType] = [.White, .Black, .White, .Black, .White, .White, .Black, .White,.Black, .White, .Black, .White]
@@ -200,6 +201,7 @@ import UIKit
         }
         
         if newKey.pressed() {
+            delegate?.noteOn(newKey.midiNoteNumber)
             pressedKeys.insert(newKey.midiNoteNumber)
             print("added \(newKey.midiNoteNumber), \(pressedKeys)")
         }
@@ -207,6 +209,7 @@ import UIKit
     
     private func pressRemoved(key: PianoKey) {
         if key.released() {
+            delegate?.noteOff(key.midiNoteNumber)
             pressedKeys.remove(key.midiNoteNumber)
             print("released \(key.midiNoteNumber), \(pressedKeys)")
         }
@@ -215,6 +218,7 @@ import UIKit
     // MONO ONLY
     private func pressRemovedAndPossiblyReplaced(key: PianoKey, allTouches: Set<UITouch>){
         if key.released() {
+            delegate?.noteOff(key.midiNoteNumber)
             pressedKeys.remove(key.midiNoteNumber)
             print("released \(key.midiNoteNumber), \(pressedKeys)")
             var remainingNotes = getNoteSetFromTouches(allTouches)
@@ -250,4 +254,9 @@ import UIKit
         }
     }
     
+}
+
+protocol PianoDelegate:class {
+    func noteOn(note: UInt8) -> Void
+    func noteOff(note: UInt8) -> Void
 }
