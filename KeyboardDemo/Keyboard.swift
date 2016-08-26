@@ -10,12 +10,22 @@ import UIKit
 
 @IBDesignable class Keyboard: UIView {
     // set this value for size of keyboard (7 = 1 octave):
-    let numWhiteKeys = 8
-    let root:UInt8 = 48 // pitch of lowest note
+    @IBInspectable var numWhiteKeys = 12 {
+        didSet {
+            setUp()
+        }
+    }
+    // pitch of lowest note
+    @IBInspectable var root:UInt8 = 60  {
+        didSet {
+            setUp()
+        }
+    }
+    
     enum VoiceType {
         case Mono, Poly
     }
-    let voiceType: VoiceType = .Mono
+    let voiceType: VoiceType = .Poly
     
     var pianoKeys = [PianoKey]()
     var pressedKeys = Set<UInt8>()
@@ -23,7 +33,7 @@ import UIKit
     
     // MARK: - Geometry
     let keyPattern:[PianoKey.KeyType] = [.White, .Black, .White, .Black, .White, .White, .Black, .White,.Black, .White, .Black, .White]
-    let blackKeyOffset:[CGFloat] = [4.0, 5.5, 0.0, 4.0, 5.0, 6.0, 0.0] // measured from Roland A-500 keyboard
+    let blackKeyOffset:[CGFloat] = [4.0, 5.5, 0.0, 4.0, 5.0, 6.0, 0.0] // measured from Roland A-500 keyboard, in mm (white key was 7mm)
     
     var whiteKeyWidth: CGFloat {
         get { return self.bounds.width / CGFloat(numWhiteKeys)}
@@ -66,6 +76,7 @@ import UIKit
     }
     
     private func createKeys() {
+        pianoKeys = [PianoKey]()
         var whiteKeyNum = 0
         var absoluteNum = 0
         var currentType: PianoKey.KeyType!

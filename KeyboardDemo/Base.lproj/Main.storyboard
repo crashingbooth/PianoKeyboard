@@ -21,6 +21,11 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WYb-bZ-mw6" customClass="Keyboard" customModule="KeyboardDemo" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="600" height="420"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="root">
+                                        <integer key="value" value="60"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
                             </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -31,6 +36,9 @@
                             <constraint firstAttribute="trailingMargin" secondItem="WYb-bZ-mw6" secondAttribute="trailing" constant="-20" id="uTc-To-xc0"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="myKeyboard" destination="WYb-bZ-mw6" id="hOn-Zs-WEE"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>

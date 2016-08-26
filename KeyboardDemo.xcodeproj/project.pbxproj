@@ -13,7 +13,6 @@
 		1F142C821D6C1CC60058AB63 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F142C811D6C1CC60058AB63 /* Assets.xcassets */; };
 		1F142C851D6C1CC60058AB63 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F142C831D6C1CC60058AB63 /* LaunchScreen.storyboard */; };
 		1F142C901D6C1CC60058AB63 /* KeyboardDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F142C8F1D6C1CC60058AB63 /* KeyboardDemoTests.swift */; };
-		1F142C9B1D6C1D8C0058AB63 /* Keyboard.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1F142C9A1D6C1D8C0058AB63 /* Keyboard.xib */; };
 		1F142C9D1D6C1E080058AB63 /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F142C9C1D6C1E080058AB63 /* Keyboard.swift */; };
 		1F142C9F1D6C238B0058AB63 /* PianoKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F142C9E1D6C238B0058AB63 /* PianoKey.swift */; };
 /* End PBXBuildFile section */
@@ -39,7 +38,6 @@
 		1F142C8B1D6C1CC60058AB63 /* KeyboardDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeyboardDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F142C8F1D6C1CC60058AB63 /* KeyboardDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDemoTests.swift; sourceTree = "<group>"; };
 		1F142C911D6C1CC60058AB63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F142C9A1D6C1D8C0058AB63 /* Keyboard.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Keyboard.xib; sourceTree = "<group>"; };
 		1F142C9C1D6C1E080058AB63 /* Keyboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
 		1F142C9E1D6C238B0058AB63 /* PianoKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PianoKey.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -85,7 +83,6 @@
 			children = (
 				1F142C7A1D6C1CC60058AB63 /* AppDelegate.swift */,
 				1F142C7C1D6C1CC60058AB63 /* ViewController.swift */,
-				1F142C9A1D6C1D8C0058AB63 /* Keyboard.xib */,
 				1F142C9C1D6C1E080058AB63 /* Keyboard.swift */,
 				1F142C9E1D6C238B0058AB63 /* PianoKey.swift */,
 				1F142C7E1D6C1CC60058AB63 /* Main.storyboard */,
@@ -188,7 +185,6 @@
 			files = (
 				1F142C851D6C1CC60058AB63 /* LaunchScreen.storyboard in Resources */,
 				1F142C821D6C1CC60058AB63 /* Assets.xcassets in Resources */,
-				1F142C9B1D6C1D8C0058AB63 /* Keyboard.xib in Resources */,
 				1F142C801D6C1CC60058AB63 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -404,6 +400,7 @@
 				1F142C961D6C1CC60058AB63 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		1F142C971D6C1CC60058AB63 /* Build configuration list for PBXNativeTarget "KeyboardDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -412,6 +409,7 @@
 				1F142C991D6C1CC60058AB63 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
