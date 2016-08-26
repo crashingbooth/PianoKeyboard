@@ -10,8 +10,12 @@ import UIKit
 
 @IBDesignable class Keyboard: UIView {
     // set this value for size of keyboard (7 = 1 octave):
-    let numWhiteKeys = 14
+    let numWhiteKeys = 8
     let root:UInt8 = 48 // pitch of lowest note
+    enum VoiceType {
+        case Mono, Poly
+    }
+    let voiceType: VoiceType = .Mono
     
     var pianoKeys = [PianoKey]()
     var pressedKeys = Set<UInt8>()
@@ -109,7 +113,7 @@ import UIKit
     // MARK: - Override Touch Methods
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
         for touch in touches {
-            if let key = getKeyOfTouch(touch) {
+            if let key = getKeyFromLocation(touch.locationInView(self)) {
                 pressAdded(key)
                 verifyTouches(event?.allTouches() ?? Set<UITouch>())
             }
@@ -121,7 +125,7 @@ import UIKit
             if !self.frame.contains(touch.locationInView(self)) {
                 verifyTouches(event?.allTouches() ?? Set<UITouch>())
             } else {
-                if let key = getKeyOfTouch(touch) {
+                if let key = getKeyFromLocation(touch.locationInView(self)) where key != getKeyFromLocation(touch.previousLocationInView(self)) {
                     pressAdded(key)
                     verifyTouches(event?.allTouches() ?? Set<UITouch>())
                 }            }
@@ -129,16 +133,19 @@ import UIKit
     }
     
     override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        
         for touch in touches {
-            if let key = getKeyOfTouch(touch) {
+            if let key = getKeyFromLocation(touch.locationInView(self)) {
                 
                 // verify that there isn't another finger pressed to same key
                 if var allTouches = event?.allTouches() {
                     allTouches.remove(touch)
                     let noteSet = getNoteSetFromTouches(allTouches)
                     if !noteSet.contains(key.midiNoteNumber) {
-                        pressRemoved(key)
+                        if voiceType == .Mono {
+                            pressRemovedAndPossiblyReplaced(key, allTouches: allTouches)
+                        } else {
+                            pressRemoved(key)
+                        }
                     }
                 }
             }
@@ -155,8 +162,7 @@ import UIKit
     }
     
     // MARK: - Identify Keys
-    private func getKeyOfTouch(touch: UITouch) -> PianoKey? {
-        let loc = touch.locationInView(self)
+    private func getKeyFromLocation(loc: CGPoint) -> PianoKey? {
         var selection: PianoKey?
         var selectedKeys = [PianoKey]()
         for key in pianoKeys {
@@ -186,10 +192,16 @@ import UIKit
     }
 
     // MARK: - Handling Keys
-    private func pressAdded(key: PianoKey) {
-        if key.pressed() {
-            pressedKeys.insert(key.midiNoteNumber)
-            print("added \(key.midiNoteNumber), \(pressedKeys)")
+    private func pressAdded(newKey: PianoKey) {
+        if voiceType == .Mono {
+            for key in pianoKeys where key != newKey {
+                pressRemoved(key)
+            }
+        }
+        
+        if newKey.pressed() {
+            pressedKeys.insert(newKey.midiNoteNumber)
+            print("added \(newKey.midiNoteNumber), \(pressedKeys)")
         }
     }
     
@@ -200,11 +212,25 @@ import UIKit
         }
     }
     
+    // MONO ONLY
+    private func pressRemovedAndPossiblyReplaced(key: PianoKey, allTouches: Set<UITouch>){
+        if key.released() {
+            pressedKeys.remove(key.midiNoteNumber)
+            print("released \(key.midiNoteNumber), \(pressedKeys)")
+            var remainingNotes = getNoteSetFromTouches(allTouches)
+            remainingNotes.remove(key.midiNoteNumber)
+            if let highest = remainingNotes.maxElement() {
+                pressAdded(getKeyFromMidiNote(highest))
+            }
+            
+        }
+    }
+    
     // MARK: - Verify Keys
     private func getNoteSetFromTouches(touches: Set<UITouch>) -> Set<UInt8> {
         var touchedKeys = Set<UInt8>()
         for touch in touches {
-            if let key = getKeyOfTouch(touch) {
+            if let key = getKeyFromLocation(touch.locationInView(self)) {
                 touchedKeys.insert(key.midiNoteNumber)
             }
         }
