@@ -13,9 +13,12 @@ class ViewController: UIViewController, PianoDelegate {
     var sampler:AVAudioUnitSampler!
     var engine: AVAudioEngine!
     @IBOutlet weak var myKeyboard: Keyboard!
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         myKeyboard.delegate = self
+       
 
         engine = AVAudioEngine()
         sampler = AVAudioUnitSampler()

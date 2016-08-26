@@ -10,17 +10,18 @@ import UIKit
 
 @IBDesignable class Keyboard: UIView {
     // set this value for size of keyboard (7 = 1 octave):
-    @IBInspectable var numWhiteKeys = 12 {
-        didSet {
-            setUp()
-        }
+    @IBInspectable var numWhiteKeys:Int = 12 {
+        didSet { setUp() }
     }
     // pitch of lowest note
     @IBInspectable var root:UInt8 = 60  {
-        didSet {
-            setUp()
-        }
+        didSet { setUp() }
     }
+    
+    enum WhiteNotes: Int {
+        case C = 0, D = 2, E = 4, F = 5, G = 7, A = 9, B = 11
+    }
+    let lowestWhiteNote: Int = 0
     
     enum VoiceType {
         case Mono, Poly
@@ -76,9 +77,14 @@ import UIKit
     }
     
     private func createKeys() {
+        // clean if necessary
+        for key in pianoKeys {
+            key.removeFromSuperview()
+        }
         pianoKeys = [PianoKey]()
+        
         var whiteKeyNum = 0
-        var absoluteNum = 0
+        var absoluteNum = lowestWhiteNote
         var currentType: PianoKey.KeyType!
         while whiteKeyNum <= numWhiteKeys {
             currentType = keyPattern[absoluteNum % 12]
