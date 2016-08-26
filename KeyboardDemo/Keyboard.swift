@@ -70,7 +70,7 @@ import UIKit
         } else {
             // if multiple keys, only press black key
             for key in selectedKeys {
-                if key.keyType == PianoKey.KeyType.Black && key.keyState != .Pressed {
+                if key.keyType == PianoKey.KeyType.Black {
                     selection = key
                     break
                 }
@@ -80,38 +80,31 @@ import UIKit
 
     }
     
-
+    // MARK; - Override Touch Methods
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        print("numTouhces \(touches.count), in events \(event!.allTouches()!.count)")
         for touch in touches {
-             checkKeysForTouch(touch)
+            if let key = getKeyOfTouch(touch) {
+                pressAdded(key)
+                let noteSet = getNoteSetFromTouches(touches)
+                print("noteSet in touchesBegan: \(noteSet)")
+                var allTouches = event?.allTouches() ?? Set<UITouch>()
+                allTouches.insert(touch)
+            verifyTouches(allTouches)
+            }
         }
     }
     
     override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
         for touch in touches {
             if !self.frame.contains(touch.locationInView(self)) {
-                findOldKeyFromTouchAndRelease(touch, newKey: nil)
+               verifyTouches(event?.allTouches() ?? Set<UITouch>())
+//                findOldKeyFromTouchAndRelease(touch, newKey: nil)
             } else {
-                checkKeysForTouch(touch)
-            }
-        }
-    }
-    
-    
-    private func checkKeysForTouch(touch:UITouch) {
-        if let key = getKeyOfTouch(touch) {
-            pressAdded(key)
-            findOldKeyFromTouchAndRelease(touch, newKey: key)
-        }
-    }
-    
-    // maybe don't care about newkey, b/c checking alltouches
-    private func findOldKeyFromTouchAndRelease(touch: UITouch, newKey: PianoKey? = nil) {
-        let oldLoc = touch.previousLocationInView(self)
-        for key in pianoKeys {
-            if key.frame.contains(oldLoc) && key != newKey {
-                pressRemoved(key)
-            }
+                if let key = getKeyOfTouch(touch) {
+                    pressAdded(key)
+                    verifyTouches(event?.allTouches() ?? Set<UITouch>())
+                }            }
         }
     }
     
@@ -141,6 +134,25 @@ import UIKit
         
     }
     
+    
+//    private func checkKeysForTouch(touch:UITouch) {
+//        if let key = getKeyOfTouch(touch) {
+//            pressAdded(key)
+////            findOldKeyFromTouchAndRelease(touch, newKey: key)
+//        }
+//    }
+//    
+//    // maybe don't care about newkey, b/c checking alltouches
+//    private func findOldKeyFromTouchAndRelease(touch: UITouch, newKey: PianoKey? = nil) {
+//        let oldLoc = touch.previousLocationInView(self)
+//        for key in pianoKeys {
+//            if key.frame.contains(oldLoc) && key != newKey {
+//                pressRemoved(key)
+//            }
+//        }
+//    }
+  
+    
     private func pressAdded(key: PianoKey) {
         if key.pressed() {
             pressedKeys.insert(key.midiNoteNumber)
@@ -157,9 +169,11 @@ import UIKit
     
     private func getNoteSetFromTouches(touches: Set<UITouch>) -> Set<UInt8> {
         var touchedKeys = Set<UInt8>()
+        print("num touches in getNoteSet: \(touches.count)")
         for touch in touches {
             if let key = getKeyOfTouch(touch) {
                 touchedKeys.insert(key.midiNoteNumber)
+                print("found key: \(key.midiNoteNumber)")
             }
         }
         return touchedKeys
@@ -168,14 +182,17 @@ import UIKit
     
     private func verifyTouches(touches: Set<UITouch>) {
         // clean up any stuck notes
-        let disjunct = pressedKeys.subtract(getNoteSetFromTouches(touches))
+        let notesFromTouches = getNoteSetFromTouches(touches)
+        let disjunct = pressedKeys.subtract(notesFromTouches)
         if !disjunct.isEmpty {
-            print("stuck notes: \(disjunct)")
+            print("stuck notes: \(disjunct) touches at\(notesFromTouches)")
             for note in disjunct {
                 pressRemoved(getKeyFromMidiNote(note))
             }
         }
     }
+    
+    
     
     private func getKeyFromMidiNote(midiNoteNumber: UInt8) -> PianoKey {
         let index = Int(midiNoteNumber - root)
