@@ -13,15 +13,23 @@ import UIKit
     @IBInspectable var numWhiteKeys:Int = 12 {
         didSet { setUp() }
     }
-    // pitch of lowest note
-    @IBInspectable var root:UInt8 = 60  {
+    
+    // set register of keyboard
+    @IBInspectable var octave:UInt8 = 5 {
         didSet { setUp() }
+    }
+    
+    // pitch of lowest C, if whiteNotes are not offset
+    var root: UInt8 {
+        return octave * 12
     }
     
     enum WhiteNotes: Int {
         case C = 0, D = 2, E = 4, F = 5, G = 7, A = 9, B = 11
     }
-    let lowestWhiteNote: Int = 0
+    
+    // set leftmost white key here, will auto transpose
+    var lowestWhiteNote: WhiteNotes = .G
     
     enum VoiceType {
         case Mono, Poly
@@ -34,7 +42,7 @@ import UIKit
     
     // MARK: - Geometry
     let keyPattern:[PianoKey.KeyType] = [.White, .Black, .White, .Black, .White, .White, .Black, .White,.Black, .White, .Black, .White]
-    let blackKeyOffset:[CGFloat] = [4.0, 5.5, 0.0, 4.0, 5.0, 6.0, 0.0] // measured from Roland A-500 keyboard, in mm (white key was 7mm)
+    let blackKeyOffset:[CGFloat] = [0.0, 4.0, 0.0, 5.5, 0.0, 0.0, 4.0, 0.0, 5.0, 0.0, 6.0, 0.0] // measured from Roland A-500 keyboard, in mm (white keys were 7mm)
     
     var whiteKeyWidth: CGFloat {
         get { return self.bounds.width / CGFloat(numWhiteKeys)}
@@ -45,8 +53,16 @@ import UIKit
     var blackKeyWidth: CGFloat {
         get { return whiteKeyWidth * (5.0/7.0)} // measured from Roland A-500 keyboard
     }
+    
+    @IBInspectable var blackKeyHeightRatio: CGFloat = 0.65 {
+        didSet {
+            if blackKeyHeightRatio < 0 || blackKeyHeightRatio > 1.0 {
+                blackKeyHeightRatio = oldValue
+            }
+        }
+    }
     var blackKeyHeight: CGFloat {
-        get { return whiteKeyHeight * 0.65}
+        get { return whiteKeyHeight * blackKeyHeightRatio}
     }
    
     
@@ -84,7 +100,7 @@ import UIKit
         pianoKeys = [PianoKey]()
         
         var whiteKeyNum = 0
-        var absoluteNum = lowestWhiteNote
+        var absoluteNum = lowestWhiteNote.rawValue
         var currentType: PianoKey.KeyType!
         while whiteKeyNum <= numWhiteKeys {
             currentType = keyPattern[absoluteNum % 12]
@@ -106,13 +122,13 @@ import UIKit
         }
         
         var whiteKeyNum = 0
-        for key in pianoKeys {
+        for (index, key) in pianoKeys.enumerate() {
             let keyFrame: CGRect!
             if key.keyType == PianoKey.KeyType.White {
                 keyFrame = CGRect(x: CGFloat(whiteKeyNum) * whiteKeyWidth, y: 0, width: whiteKeyWidth, height: whiteKeyHeight)
                 whiteKeyNum += 1
             } else {
-                let offset = blackKeyOffset[(whiteKeyNum - 1) % 7]
+                let offset = blackKeyOffset[(index + lowestWhiteNote.rawValue) % 12]
                 keyFrame = CGRect(x: CGFloat(whiteKeyNum - 1) * whiteKeyWidth + whiteKeyWidth * (offset/7.0), y: 0, width: blackKeyWidth, height: blackKeyHeight)
             }
             key.frame = keyFrame
@@ -205,7 +221,7 @@ import UIKit
     }
     
     private func getKeyFromMidiNote(midiNoteNumber: UInt8) -> PianoKey {
-        let index = Int(midiNoteNumber - root)
+        let index = Int(midiNoteNumber - root - UInt8(lowestWhiteNote.rawValue))
         return pianoKeys[index]
     }
 
