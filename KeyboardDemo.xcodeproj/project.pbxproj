@@ -38,8 +38,8 @@
 		1F142C8B1D6C1CC60058AB63 /* KeyboardDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeyboardDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F142C8F1D6C1CC60058AB63 /* KeyboardDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardDemoTests.swift; sourceTree = "<group>"; };
 		1F142C911D6C1CC60058AB63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1F142C9C1D6C1E080058AB63 /* Keyboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
-		1F142C9E1D6C238B0058AB63 /* PianoKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PianoKey.swift; sourceTree = "<group>"; };
+		1F142C9C1D6C1E080058AB63 /* Keyboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Keyboard.swift; path = KeyboardDemo/Keyboard.swift; sourceTree = "<group>"; };
+		1F142C9E1D6C238B0058AB63 /* PianoKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PianoKey.swift; path = KeyboardDemo/PianoKey.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +63,8 @@
 		1F142C6E1D6C1CC60058AB63 = {
 			isa = PBXGroup;
 			children = (
+				1F142C9C1D6C1E080058AB63 /* Keyboard.swift */,
+				1F142C9E1D6C238B0058AB63 /* PianoKey.swift */,
 				1F142C791D6C1CC60058AB63 /* KeyboardDemo */,
 				1F142C8E1D6C1CC60058AB63 /* KeyboardDemoTests */,
 				1F142C781D6C1CC60058AB63 /* Products */,
@@ -83,8 +85,6 @@
 			children = (
 				1F142C7A1D6C1CC60058AB63 /* AppDelegate.swift */,
 				1F142C7C1D6C1CC60058AB63 /* ViewController.swift */,
-				1F142C9C1D6C1E080058AB63 /* Keyboard.swift */,
-				1F142C9E1D6C238B0058AB63 /* PianoKey.swift */,
 				1F142C7E1D6C1CC60058AB63 /* Main.storyboard */,
 				1F142C811D6C1CC60058AB63 /* Assets.xcassets */,
 				1F142C831D6C1CC60058AB63 /* LaunchScreen.storyboard */,
