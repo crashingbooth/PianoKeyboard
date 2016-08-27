@@ -39,7 +39,11 @@ import UIKit
     }
     
     // set leftmost white key here, will auto transpose
-    var lowestWhiteNote: WhiteNotes = .C
+    var lowestWhiteNote: WhiteNotes = .C {
+        didSet {
+            setUp()
+        }
+    }
     
     enum VoiceType {
         case Mono, Poly
