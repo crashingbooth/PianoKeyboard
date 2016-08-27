@@ -17,9 +17,10 @@ class ViewController: UIViewController, PianoDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // assign delegate
         myKeyboard.delegate = self
        
-
+        // create engine, sampler and session
         engine = AVAudioEngine()
         sampler = AVAudioUnitSampler()
         engine.attachNode(sampler)
@@ -36,12 +37,10 @@ class ViewController: UIViewController, PianoDelegate {
             print("set up failed")
             return
         }
-        
-        
     }
     
     
-    
+    // MARK: - Keyboard Delegate Methods
     func noteOn(note: UInt8) {
         sampler.startNote(note, withVelocity: 120, onChannel: 0)
     }

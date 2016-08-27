@@ -11,12 +11,22 @@ import UIKit
 @IBDesignable class Keyboard: UIView {
     // set this value for size of keyboard (7 = 1 octave):
     @IBInspectable var numWhiteKeys:Int = 12 {
-        didSet { setUp() }
+        didSet {
+            if numWhiteKeys < 5 {
+                numWhiteKeys = oldValue
+            }
+            setUp()
+        }
     }
     
     // set register of keyboard
     @IBInspectable var octave:UInt8 = 5 {
-        didSet { setUp() }
+        didSet {
+            if octave < 1 || octave > 7 {
+                octave == oldValue
+            }
+            setUp()
+        }
     }
     
     // pitch of lowest C, if whiteNotes are not offset
@@ -29,7 +39,7 @@ import UIKit
     }
     
     // set leftmost white key here, will auto transpose
-    var lowestWhiteNote: WhiteNotes = .G
+    var lowestWhiteNote: WhiteNotes = .C
     
     enum VoiceType {
         case Mono, Poly
