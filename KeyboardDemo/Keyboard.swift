@@ -44,7 +44,12 @@ import UIKit
     enum VoiceType {
         case Mono, Poly
     }
-    let voiceType: VoiceType = .Poly
+    
+    @IBInspectable var isPolyphonic: Bool = true
+    var voiceType: VoiceType {
+        let val:VoiceType = isPolyphonic ? .Poly : .Mono
+        return val
+    }
     
     var pianoKeys = [PianoKey]()
     var pressedKeys = Set<UInt8>()

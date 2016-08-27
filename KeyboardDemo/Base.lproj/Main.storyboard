@@ -37,6 +37,7 @@
                                     <userDefinedRuntimeAttribute type="number" keyPath="blackKeyHeightRatio">
                                         <real key="value" value="0.65000000000000002"/>
                                     </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isPolyphonic" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                             </view>
                         </subviews>
