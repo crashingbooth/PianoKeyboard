@@ -14,7 +14,6 @@ class ViewController: UIViewController, PianoDelegate {
     var engine: AVAudioEngine!
     @IBOutlet weak var myKeyboard: Keyboard!
 
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         // assign delegate
@@ -23,22 +22,21 @@ class ViewController: UIViewController, PianoDelegate {
         // create engine, sampler and session
         engine = AVAudioEngine()
         sampler = AVAudioUnitSampler()
-        engine.attachNode(sampler)
+        engine.attach(sampler)
         engine.connect(sampler, to: engine.mainMixerNode, format: nil)
         let audioSession = AVAudioSession.sharedInstance()
         
         // start engine, set up audio session
         do {
             try engine.start()
-            try audioSession.setCategory(AVAudioSessionCategoryPlayback, withOptions:
-                AVAudioSessionCategoryOptions.MixWithOthers)
+            try audioSession.setCategory(AVAudioSessionCategoryPlayback, with:
+                AVAudioSessionCategoryOptions.mixWithOthers)
             try audioSession.setActive(true)
         } catch {
             print("set up failed")
             return
         }
     }
-    
     
     // MARK: - Keyboard Delegate Methods
     func noteOn(note: UInt8) {
