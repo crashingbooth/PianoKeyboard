@@ -5,12 +5,11 @@
 //  Created by Jeff Holtzkener on 8/23/16.
 //  Copyright © 2016 Jeff Holtzkener. All rights reserved.
 //
-
 import UIKit
 
 @IBDesignable class Keyboard: UIView {
     // set this value for size of keyboard (7 = 1 octave):
-    @IBInspectable var numWhiteKeys:Int = 12 {
+    @IBInspectable var numWhiteKeys: Int = 12 {
         didSet {
             if numWhiteKeys < 5 {
                 numWhiteKeys = oldValue
@@ -20,7 +19,7 @@ import UIKit
     }
     
     // set register of keyboard
-    @IBInspectable var octave:UInt8 = 5 {
+    @IBInspectable var octave: UInt8 = 5 {
         didSet {
             if octave < 1 || octave > 7 {
                 octave = oldValue
@@ -51,34 +50,35 @@ import UIKit
     
     @IBInspectable var isPolyphonic: Bool = true
     var voiceType: VoiceType {
-        let val:VoiceType = isPolyphonic ? .Poly : .Mono
+        let val: VoiceType = isPolyphonic ? .Poly : .Mono
         return val
     }
     
     var pianoKeys = [PianoKey]()
+    var pitchToKeyDict = [UInt8: PianoKey]()
     var pressedKeys = Set<UInt8>()
     weak var delegate: PianoDelegate?
     
     // MARK: - Geometry
-    let keyPattern:[PianoKey.KeyType] = [.whiteKey, .blackKey, .whiteKey,
-                                         .blackKey, .whiteKey, .whiteKey,
-                                         .blackKey, .whiteKey,.blackKey,
-                                         .whiteKey, .blackKey, .whiteKey]
+    let keyPattern: [PianoKey.KeyType] = [.whiteKey, .blackKey, .whiteKey,
+                                          .blackKey, .whiteKey, .whiteKey,
+                                          .blackKey, .whiteKey, .blackKey,
+                                          .whiteKey, .blackKey, .whiteKey]
     
     // measured from Roland A-500 keyboard, in mm (white keys were 7mm)
-    let blackKeyOffset:[CGFloat] = [0.0, 4.0, 0.0, 5.5, 0.0, 0.0, 4.0, 0.0, 5.0, 0.0, 6.0, 0.0]
+    let blackKeyOffset: [CGFloat] = [0.0, 4.0, 0.0, 5.5, 0.0, 0.0, 4.0, 0.0, 5.0, 0.0, 6.0, 0.0]
     
     var whiteKeyWidth: CGFloat {
-        get { return self.bounds.width / CGFloat(numWhiteKeys)}
+        return self.bounds.width / CGFloat(numWhiteKeys)
     }
     
     var whiteKeyHeight: CGFloat {
-        get { return self.bounds.height }
+        return self.bounds.height
     }
     
     // measured from Roland A-500 keyboard
     var blackKeyWidth: CGFloat {
-        get { return whiteKeyWidth * (5.0/7.0)}
+        return whiteKeyWidth * (5.0/7.0)
     }
     
     @IBInspectable var blackKeyHeightRatio: CGFloat = 0.65 {
@@ -90,9 +90,9 @@ import UIKit
     }
     
     var blackKeyHeight: CGFloat {
-        get { return whiteKeyHeight * blackKeyHeightRatio}
+        return whiteKeyHeight * blackKeyHeightRatio
     }
-   
+    
     // MARK: - Init and SetUp
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -134,10 +134,11 @@ import UIKit
                 whiteKeyNum += 1
             }
             if whiteKeyNum == numWhiteKeys && currentType == .blackKey { break }
-            let key = PianoKey(frame: CGRect.zero, midiNoteNumber: root + UInt8(absoluteNum), type: currentType)
-            
+            let midiNote = root + UInt8(absoluteNum)
+            let key = PianoKey(frame: CGRect.zero, midiNoteNumber: midiNote, type: currentType)
             
             pianoKeys.append(key)
+            pitchToKeyDict[midiNote] = key
             absoluteNum += 1
         }
     }
@@ -151,7 +152,10 @@ import UIKit
         for (index, key) in pianoKeys.enumerated() {
             let keyFrame: CGRect!
             if key.keyType == PianoKey.KeyType.whiteKey {
-                keyFrame = CGRect(x: CGFloat(whiteKeyNum) * whiteKeyWidth, y: 0, width: whiteKeyWidth, height: whiteKeyHeight)
+                keyFrame = CGRect(x: CGFloat(whiteKeyNum) * whiteKeyWidth,
+                                  y: 0,
+                                  width: whiteKeyWidth,
+                                  height: whiteKeyHeight)
                 whiteKeyNum += 1
             } else {
                 let offset = blackKeyOffset[(index + lowestWhiteNote.rawValue) % 12]
@@ -165,13 +169,24 @@ import UIKit
         }
         
         // put black keys on top
-        for key in pianoKeys {
-            if key.keyType == PianoKey.KeyType.blackKey {
-                bringSubview(toFront: key)
-            }
+        for key in pianoKeys where key.keyType == PianoKey.KeyType.blackKey {
+            bringSubview(toFront: key)
         }
     }
+    // MARK: - Light Keys from External Source
+    func turnKeyOn(midiNoteNumber: UInt8) {
+        let key = getKeyFromMidiNote(midiNoteNumber: midiNoteNumber)
+        _ = key?.pressed()
+    }
     
+    func turnKeyOff(midiNoteNumber: UInt8) {
+        let key = getKeyFromMidiNote(midiNoteNumber: midiNoteNumber)
+        _ = key?.released()
+    }
+    
+    func turnAllKeysOff() {
+        pianoKeys.forEach { _ = $0.released() }
+    }
     
     // MARK: - Override Touch Methods
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -240,21 +255,18 @@ import UIKit
             selection = selectedKeys[0]
         } else {
             // if multiple keys (b/c keys overlap white), only select black key
-            for key in selectedKeys {
-                if key.keyType == PianoKey.KeyType.blackKey {
-                    selection = key
-                    break
-                }
+            for key in selectedKeys where key.keyType == PianoKey.KeyType.blackKey {
+                selection = key
+                break
             }
         }
         return selection
     }
     
-    private func getKeyFromMidiNote(midiNoteNumber: UInt8) -> PianoKey {
-        let index = Int(midiNoteNumber - root - UInt8(lowestWhiteNote.rawValue))
-        return pianoKeys[index]
+    private func getKeyFromMidiNote(midiNoteNumber: UInt8) -> PianoKey? {
+        return pitchToKeyDict[midiNoteNumber]
     }
-
+    
     // MARK: - Handling Keys
     private func pressAdded(newKey: PianoKey) {
         if voiceType == .Mono {
@@ -279,7 +291,7 @@ import UIKit
     }
     
     // MONO ONLY
-    private func pressRemovedAndPossiblyReplaced(key: PianoKey, allTouches: Set<UITouch>){
+    private func pressRemovedAndPossiblyReplaced(key: PianoKey, allTouches: Set<UITouch>) {
         if key.released() {
             delegate?.noteOff(note: key.midiNoteNumber)
             pressedKeys.remove(key.midiNoteNumber)
@@ -287,7 +299,7 @@ import UIKit
             var remainingNotes = getNoteSetFromTouches(touches: allTouches)
             remainingNotes.remove(key.midiNoteNumber)
             if let highest = remainingNotes.max() {
-                pressAdded(newKey: getKeyFromMidiNote(midiNoteNumber: highest))
+                pressAdded(newKey: getKeyFromMidiNote(midiNoteNumber: highest)!)
             }
         }
     }
@@ -310,13 +322,14 @@ import UIKit
         if !disjunct.isEmpty {
             print("stuck notes: \(disjunct) touches at\(notesFromTouches)")
             for note in disjunct {
-                pressRemoved(key: getKeyFromMidiNote(midiNoteNumber: note))
+                pressRemoved(key: getKeyFromMidiNote(midiNoteNumber: note)!)
             }
         }
     }
 }
 
-protocol PianoDelegate:class {
-    func noteOn(note: UInt8) -> Void
-    func noteOff(note: UInt8) -> Void
+protocol PianoDelegate: class {
+    func noteOn(note: UInt8)
+    func noteOff(note: UInt8)
 }
+
