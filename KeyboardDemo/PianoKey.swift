@@ -5,7 +5,6 @@
 //  Created by Jeff Holtzkener on 8/23/16.
 //  Copyright © 2016 Jeff Holtzkener. All rights reserved.
 //
-
 import UIKit
 
 class PianoKey: UIButton {
@@ -32,7 +31,6 @@ class PianoKey: UIButton {
         isUserInteractionEnabled = false
     }
     
-  
     required init?(coder aDecoder: NSCoder) {
         // will never call this
         self.normalColor = .black
@@ -43,14 +41,14 @@ class PianoKey: UIButton {
     
     func getPathAtMargin() -> UIBezierPath {
         // set margin property if wanted
-        let cornerRadius =  CGSize(width: self.bounds.width / 5.0, height:  self.bounds.width / 5.0)
+        let cornerRadius =  CGSize(width: self.bounds.width / 5.0, height: self.bounds.width / 5.0)
         let marginRect = CGRect(x: margin,
                                 y: margin,
                                 width: self.bounds.width - (margin * 2.0),
                                 height: self.bounds.height - (margin * 2.0))
         let path = UIBezierPath(roundedRect: marginRect,
                                 byRoundingCorners: [.bottomLeft, .bottomRight],
-                                cornerRadii:  cornerRadius)
+                                cornerRadii: cornerRadius)
         path.lineWidth = 2.0
         
         return path
@@ -74,22 +72,26 @@ class PianoKey: UIButton {
         maskLayer.path = path.cgPath
         self.layer.mask = maskLayer
     }
-
+    
     // MARK: - Respond to key presses
     func pressed() -> Bool {
         if keyState != .pressed {
             keyState = .pressed
-            setNeedsDisplay()
+            DispatchQueue.main.async {
+                self.setNeedsDisplay()
+            }
             return true
         } else {
             return false
         }
     }
-
+    
     func released() -> Bool {
         if keyState != .notPressed {
             keyState = .notPressed
-            setNeedsDisplay()
+            DispatchQueue.main.async {
+                self.setNeedsDisplay()
+            }
             return true
         } else {
             return false
