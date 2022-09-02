@@ -1,7 +1,7 @@
 ## PianoKeyboard
 ![screenshot](ScreenShot.png)
 
-*Updated 16/04/2018 for Swift 4.1, because apparently some people still use this.  If you're making a music app in Swift and you're not using AudioKit. . . why not? AudioKit's AKKeyboardView (which has inherited some of its multi-touch logic from here) is what I'd probably use these days.  But this is still here, if anyone wants to go frame-work free.*
+*Updated 16/04/2018 for Swift 4.1, because apparently some people still use this.*  If you're making a music app in Swift and you're not using AudioKit. . . why not? If you're using SwiftUI, the new [AudioKit keyboard](https://github.com/AudioKit/Keyboard/) looks fantastic and has most anything you could want.  But this is still here, if anyone wants to go framework free.
 
 PianoKeyboard is a basic touch piano keyboard wrtten in Swift that can be used in iOS music apps. It is light-weight, and its behaviour can be easily customized either in code or through Storyboard with @IBInspectables. 
 
